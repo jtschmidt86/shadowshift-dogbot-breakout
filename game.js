@@ -39,7 +39,16 @@ function tile(x,z,w=4,d=4,c=0x2a3354,e=0x183862){const m=new THREE.Mesh(new THRE
 function coin(x,y,z){const m=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.15,16),new THREE.MeshStandardMaterial({color:0xffd94f,emissive:0x554400}));m.rotation.x=Math.PI/2;m.position.set(x,y,z);world.group.add(m);world.coins.push(m);}
 function enemy(x,z,hp=40,type='bot'){const g=new THREE.Group(); const m=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.4,1.2),new THREE.MeshStandardMaterial({color:type==='pup'?0xff9955:0xff5b8f})); m.position.y=1; g.add(m); const eyeMat=new THREE.MeshBasicMaterial({color:0xff3344}); const e1=new THREE.Mesh(new THREE.SphereGeometry(0.1,8,8),eyeMat); const e2=e1.clone(); e1.position.set(-0.2,1.15,0.62); e2.position.set(0.2,1.15,0.62); g.add(e1,e2); g.position.set(x,0,z); g.userData={hp,cooldown:0,type,home:new THREE.Vector3(x,0,z),dead:false,core:m}; world.group.add(g); world.enemies.push(g);}
 function pickup(x,y,z,type,color){const mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(0.45),new THREE.MeshBasicMaterial({color})); mesh.position.set(x,y,z); world.group.add(mesh); world.pickups.push({mesh,type});}
-function hole(x,z,r=1.2){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.5,20),new THREE.MeshBasicMaterial({color:0x000000})); m.position.set(x,0.26,z); world.group.add(m); world.hazards.push({mesh:m,type:'hole',radius:r});}
+function hole(x,z,r=1.2){
+  const pit = new THREE.Group();
+  const glow = new THREE.Mesh(new THREE.RingGeometry(r*0.98,r*1.24,4,1),new THREE.MeshBasicMaterial({color:0xaa335f,transparent:true,opacity:0.75,side:THREE.DoubleSide}));
+  glow.rotation.x=-Math.PI/2; glow.position.y=0.53; pit.add(glow);
+  const shaft = new THREE.Mesh(new THREE.BoxGeometry(r*1.8,9,r*1.8),new THREE.MeshBasicMaterial({color:0x05050d}));
+  shaft.position.y=-4.1; pit.add(shaft);
+  const abyss = new THREE.Mesh(new THREE.PlaneGeometry(r*1.7,r*1.7),new THREE.MeshBasicMaterial({color:0x13001f,transparent:true,opacity:0.9,side:THREE.DoubleSide}));
+  abyss.rotation.x=-Math.PI/2; abyss.position.y=-8.52; pit.add(abyss);
+  pit.position.set(x,0,z); world.group.add(pit); world.hazards.push({mesh:pit,type:'hole',radius:r});
+}
 function portal(x,z){const m=new THREE.Mesh(new THREE.CylinderGeometry(1,1,2,20),new THREE.MeshBasicMaterial({color:0x57d9ff,transparent:true,opacity:0.8}));m.position.set(x,1.2,z);world.group.add(m);world.portal=m;}
 function hudUpdate(){hud.Level.textContent=state.level;hud.Health.textContent=Math.max(0,Math.floor(state.health));hud.Energy.textContent=Math.floor(state.energy);hud.Coins.textContent=state.coins;hud.Tokens.textContent=state.tokens;hud.Objective.textContent=state.objective;hud.Checkpoint.textContent=state.checkpoint?`L${state.level}`:'None';}
 
